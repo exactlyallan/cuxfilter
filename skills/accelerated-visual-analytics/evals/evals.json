@@ -1,0 +1,128 @@
+[
+  {
+    "id": "crossfilter-dashboard-core",
+    "question": "Task: Build a GPU-backed linked dashboard from a large trip-style dataset. User prompt: Create a notebook-first dashboard over columns started_at, ended_at, start_lat, start_lng, end_lat, end_lng, rideable_type, member_casual, duration_min, day_of_week, hour, and month. Use GPU acceleration when available, linked filtering across charts, and a CPU fallback for review machines.",
+    "expected_skill": "accelerated-visual-analytics",
+    "expected_script": null,
+    "ground_truth": "A correct solution should generate a HoloViz-first Panel/hvPlot/HoloViews/Datashader dashboard with backend-aware loading, a CPU fallback or backend toggle, linked selections, visible backend state, and no cuxfilter dependency.",
+    "expected_behavior": [
+      "Correctness: Defines valid charts over the provided columns and includes notebook-first run guidance.",
+      "GPU utilization: Uses cuDF when the rough data scale and GPU availability fit, exposes a CPU fallback or backend toggle, and uses hvPlot rasterization/Datashader for dense point or line views.",
+      "Cross-filtering: Uses HoloViews linked selections plus Panel pn.bind or pn.rx for explicit widget filters rather than scattered callback state.",
+      "Fallback behavior: Imports and runs in a CPU-only environment with pandas fallback.",
+      "Code quality: Avoids cuxfilter imports, caps browser table rows, and comments on GPU/CPU conversion boundaries."
+    ]
+  },
+  {
+    "id": "visualization-library-routing",
+    "question": "Task: Choose the right NVIDIA GPU visualization stack. User prompt: Recommend visualization stacks for a 15M-row scatter plot, a one-line cuDF histogram, a Dash deployment, a large geospatial point cloud, a 3D choropleth, and a graph explorer with a cuDF edge list.",
+    "expected_skill": "accelerated-visual-analytics",
+    "expected_script": null,
+    "ground_truth": "A correct solution should route dense scatter/line/geo work to hvPlot/HoloViews/GeoViews with Datashader, notebook cuDF charts to hvPlot/HoloViews, Dash deployments to Plotly Dash with an explicit boundary if needed, deck.gl or 3D choropleths to PyDeck or Plotly, and graph analytics to cuGraph plus visualization. It should not recommend inactive RAPIDS projects for new examples.",
+    "expected_behavior": [
+      "Routing: Selects an appropriate stack for each requested visualization shape.",
+      "Boundary clarity: Identifies where cuDF-to-pandas conversion is acceptable or expensive.",
+      "Scale judgment: Uses hvPlot rasterize=True, Datashader, or equivalent rasterized aggregation for large visual marks.",
+      "cuxfilter and inactive project absence: Does not recommend installing or using cuxfilter or inactive RAPIDS project examples.",
+      "Clarity: Gives concise, implementable reasoning instead of a generic library list."
+    ]
+  },
+  {
+    "id": "cuxfilter-migration-without-cuxfilter",
+    "question": "Task: Migrate a cuxfilter-style dashboard concept without using cuxfilter. User prompt: I used to build a dashboard with cuxfilter DataFrame.from_dataframe, bar charts for month and day_of_week, a scatter over dropoff_x/dropoff_y, a duration range slider, a member_casual multi-select, and a table of station names. Rewrite this with maintained libraries and assume cuxfilter is not installed.",
+    "expected_skill": "accelerated-visual-analytics",
+    "expected_script": null,
+    "ground_truth": "A correct solution should preserve the dashboard intent using cuDF plus HoloViz-first Panel/hvPlot/HoloViews/Datashader patterns, replace old cuxfilter concepts with direct-library equivalents, and include migration notes.",
+    "expected_behavior": [
+      "Migration fidelity: Maps each old chart/filter/table concept to a direct-library equivalent.",
+      "No cuxfilter dependency: Does not import cuxfilter or ask the user to install it.",
+      "Cross-filtering: Preserves linked filtering semantics through HoloViews linked selections and Panel pn.bind or pn.rx for explicit widgets.",
+      "Scale handling: Uses hvPlot rasterize=True/Datashader for the dense scatter view.",
+      "Code quality: Keeps layout explicit, caps table rows, and documents GPU/CPU boundaries."
+    ]
+  },
+  {
+    "id": "nbbo-timeseries-explorer",
+    "question": "Task: Build an NBBO time-series explorer. User prompt: I have a large quote dataset with ts_event, symbol, bid_px, ask_px, bid_sz, ask_sz, and exchange. Build a notebook explorer with spread over time, per-symbol price traces, quote update density as time by symbol heatmap, and a single-symbol deep dive. Use cuDF first and mention Polars GPU Engine only if it helps and is already available.",
+    "expected_skill": "accelerated-visual-analytics",
+    "expected_script": null,
+    "ground_truth": "A correct solution should compute spread, choose a time-bucket granularity, use Datashader for dense traces and heatmaps, keep filter state centralized, and provide CPU fallback.",
+    "expected_behavior": [
+      "Domain fit: Computes spread and proposes the requested NBBO views.",
+      "GPU utilization: Uses cuDF for data prep and filtering with optional Polars GPU Engine only as a non-required path.",
+      "Scale handling: Uses hvPlot rasterize=True, Datashader, or equivalent aggregation for dense time series and heatmaps.",
+      "Interaction design: Provides a clear single-symbol deep dive and centralized filter state.",
+      "Dependency restraint: Does not introduce unnecessary packages or cuxfilter."
+    ]
+  },
+  {
+    "id": "polars-gpu-viz-pipeline",
+    "question": "Task: Explain and sketch a GPU-accelerated visualization pipeline for Polars. User prompt: I already have a Polars LazyFrame scanning a large parquet dataset. I want GPU-accelerated filtering and aggregation, then an interactive dashboard with a dense scatter, a small aggregate bar chart, and a bounded table. How should this work?",
+    "expected_skill": "accelerated-visual-analytics",
+    "expected_script": null,
+    "ground_truth": "A correct solution should use Polars GPU Engine for LazyFrame query acceleration with collect(engine=\"gpu\") or pl.GPUEngine, then visualize the materialized result with hvplot.polars/Panel/HoloViews/Datashader or small-chart alternatives. It should clearly distinguish query acceleration from browser rendering, keep tables bounded, and avoid cuxfilter and inactive RAPIDS projects.",
+    "expected_behavior": [
+      "Polars fit: Keeps the user's LazyFrame pipeline and uses Polars GPU Engine only at collection or sink boundaries.",
+      "Fallback clarity: Mentions Open Beta status, partial operation support, CPU fallback, and raise_on_fail when fail-loud GPU behavior is required.",
+      "Visualization routing: Uses hvplot.polars with rasterize=True/Datashader for dense views and small-chart options such as Altair or Plotly only when appropriate.",
+      "Boundary clarity: Materializes or converts only after filtering/aggregation and caps browser table rows.",
+      "Dependency restraint: Does not force cuDF-first rewrites, cuxfilter, or inactive RAPIDS projects."
+    ]
+  },
+  {
+    "id": "backend-size-routing-and-toggle",
+    "question": "Task: Choose a dataframe backend for several visualization workloads. User prompt: I have one 10-row toy array, one 250 MB local Parquet file used for a dashboard demo, one 8 GB Parquet dataset for GPU-friendly filtering/groupby, and one many-file dataset that may exceed one GPU. Explain when to use pandas, cuDF, Polars, cudf.pandas, Polars GPU Engine, or Dask, and show how generated dashboard code should allow CPU/GPU switching without rewriting the visualizations.",
+    "expected_skill": "accelerated-visual-analytics",
+    "expected_script": null,
+    "ground_truth": "A correct solution should avoid hard cuDF-first rules, explain that file size is not the same as GPU working-set memory, recommend CPU paths for tiny/small data, recommend backend toggles such as cudf.pandas, Polars GPU Engine, or explicit loader parameters for mixed hardware, use cuDF when a large GPU-friendly working set fits one GPU with margin, and use Dask with a cuDF backend for many-file or larger-than-device workloads.",
+    "expected_behavior": [
+      "Scale judgment: Uses rough data size and estimated working-set memory rather than a universal cuDF threshold.",
+      "Overhead awareness: Notes GPU startup, transfer, decompression, temporary columns, joins/groupby state, and dashboard copies as sources of overhead.",
+      "Toggle guidance: Prefers CPU/GPU toggles when the right boundary is uncertain or users run on mixed hardware.",
+      "Backend routing: Distinguishes pandas, cuDF, Polars CPU, cudf.pandas, Polars GPU Engine, and Dask/Dask-cuDF use cases.",
+      "Code restraint: Does not spin up cuDF for a size-10 array unless the point is testing the GPU path."
+    ]
+  },
+  {
+    "id": "rapids-viz-guide-cuxfilter-migration",
+    "question": "Task: Migrate the historical RAPIDS visualization guide notebook fixture. User prompt: Use evals/files/rapids-viz-guide-original.ipynb as historical input. Update the cuxfilter dashboard sections to maintained libraries while preserving the analytical intent. Assume cuxfilter is not installed and do not rely on the cuxfilter repository being present.",
+    "expected_skill": "accelerated-visual-analytics",
+    "expected_script": null,
+    "ground_truth": "A correct solution should treat the original notebook as a migration source, preserve its Divvy visualization/dashboard intent, and replace cuxfilter dashboard code with maintained cuDF or backend-aware dataframe plus HoloViz/Panel/hvPlot/HoloViews/Datashader patterns, with Dash used only where a standalone app is appropriate.",
+    "expected_behavior": [
+      "Fixture use: References rapids-viz-guide-original.ipynb as historical input and identifies the cuxfilter dashboard sections that need migration.",
+      "No cuxfilter dependency: Does not import cuxfilter, recommend installing it, or require local cuxfilter examples.",
+      "Migration fidelity: Maps cuxfilter DataFrame, dashboard, chart, widget, graph, and table concepts to direct-library equivalents.",
+      "Scale handling: Uses Datashader/rasterize or aggregated views for dense map, scatter, graph, or time-series displays.",
+      "Notebook quality: Keeps a notebook-first workflow, bounded tables, visible backend state, and concise migration notes."
+    ]
+  },
+  {
+    "id": "rapids-viz-guide-base-construction",
+    "question": "Task: Construct an updated visualization guide notebook from a base fixture. User prompt: Use evals/files/rapids-viz-guide-base.ipynb as the starting point. Complete it into a maintained RAPIDS visualization guide for the Divvy-style dataset. Include simple hvPlot charts, dense spatial views, and a notebook-first linked dashboard. Use backend-aware loading and do not use cuxfilter.",
+    "expected_skill": "accelerated-visual-analytics",
+    "expected_script": null,
+    "ground_truth": "A correct solution should extend the base notebook into a maintained GPU visualization guide using backend-aware data loading, hvPlot/HoloViews/Datashader/Panel patterns, appropriate chart selection, linked filtering or clear coordinated views, bounded display conversions, and no cuxfilter dependency.",
+    "expected_behavior": [
+      "Fixture use: Builds from rapids-viz-guide-base.ipynb rather than asking for a new dataset description.",
+      "Construction completeness: Adds appropriate simple charts, dense spatial views, and a notebook-first linked dashboard over the prepared Divvy-style columns.",
+      "Backend behavior: Keeps CPU/GPU boundaries explicit through a backend toggle or CPU fallback.",
+      "Cross-filtering: Uses HoloViews linked selections and/or Panel pn.bind or pn.rx for centralized interactive state.",
+      "Code quality: Avoids cuxfilter, caps tables or browser display rows, and includes clear notebook run instructions."
+    ]
+  },
+  {
+    "id": "negative-small-static-chart",
+    "question": "Task: Negative trigger case for a small static chart. User prompt: I have a 200-row CSV and need a static bar chart for a report. Should I build a GPU cross-filter dashboard?",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "A correct answer should not recommend a GPU dashboard for a tiny static report. It should suggest a simple CPU plotting path and explain when this skill becomes useful.",
+    "expected_behavior": [
+      "Scope control: Avoids forcing GPU dashboard infrastructure onto a tiny static chart.",
+      "Correct routing: Identifies the task as static reporting, not linked large-data exploration.",
+      "Useful guidance: Suggests lightweight pandas, matplotlib, seaborn, hvPlot, or Plotly as appropriate.",
+      "Boundary clarity: Explains the skill is for large interactive cross-filter exploration.",
+      "Code restraint: Avoids unnecessary GPU dependencies."
+    ]
+  }
+]

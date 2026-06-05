@@ -83,6 +83,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+skills/*/evals/results/
 
 # IPython
 profile_default/
