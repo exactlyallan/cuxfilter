@@ -1,20 +1,22 @@
-# cuxfilter Sunset and Accelerated Visual Analytics Skill
+# Accelerated Visual Analytics Skill (formerly cuxfilter)
+
+The repository contains a skill to help agents utilize best practices
+for NVIDIA accelerated data science visualization, as well as migrate
+cuxfilter-era notebooks and dashboard concepts.
+The new focus is utilizing the excellent visualization libraries such as
+cuDF, Polars GPU Engine, HoloViz, Panel, hvPlot, HoloViews, GeoViews,
+Datashader, Plotly Dash, Streamlit, Bokeh, and PyDeck.
 
 This repository no longer contains the historical cuxfilter Python package.
-The former package code, build recipes, release machinery, and Sphinx
-documentation have been removed as part of the cuxfilter sunset.
+as the former has been sunset.
+The last release of [cuxfilter was 26.06](https://github.com/rapidsai/cuxfilter/tree/release/26.06).
 
-The maintained replacement artifact is a portable Codex skill for accelerated
+The replacement artifact is a portable skill for accelerated
 visual analytics:
 
 ```text
 skills/accelerated-visual-analytics/
 ```
-
-The skill helps agents migrate cuxfilter-era notebooks and dashboard concepts
-to maintained NVIDIA accelerated data science and visualization patterns using
-cuDF, Polars GPU Engine, HoloViz, Panel, hvPlot, HoloViews, GeoViews,
-Datashader, Plotly Dash, Streamlit, Bokeh, and PyDeck.
 
 ## Repository Layout
 
@@ -37,6 +39,14 @@ Datashader, Plotly Dash, Streamlit, Bokeh, and PyDeck.
 └── LICENSE
 ```
 
+## Skill Evals
+
+The skill includes evals and fixtures under:
+
+```text
+skills/accelerated-visual-analytics/evals/
+```
+
 ## Historical Notebooks
 
 Historical cuxfilter notebooks have been preserved under `examples/` for
@@ -50,21 +60,4 @@ migration reference:
 These notebooks may still import or describe `cuxfilter`. Treat them as
 historical input for migration, not as maintained runnable examples.
 
-## Skill Evals
-
-The skill includes evals and fixtures under:
-
-```text
-skills/accelerated-visual-analytics/evals/
-```
-
-Useful checks:
-
-```bash
-python3 -m json.tool skills/accelerated-visual-analytics/evals/evals.json >/tmp/evals.json.checked
-python3 -m json.tool skills/accelerated-visual-analytics/evals/files/rapids-viz-guide-base.ipynb >/tmp/base.ipynb.checked
-python3 -m json.tool skills/accelerated-visual-analytics/examples/rapids-viz-guide-successful.ipynb >/tmp/success.ipynb.checked
-git diff --check
-```
-
-Do not commit generated eval results.
+Thanks for using cuxfilter!
