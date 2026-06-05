@@ -13,6 +13,13 @@ description: Generate accelerated visual analytics notebooks and dashboards with
   machines without a local GPU.
 - cuxfilter is intentionally absent. Do not install it, import it, or depend on
   its documentation being available.
+- Do not assume every visualization library is installed. Generate dependency
+  notes for the selected output only: Panel/hvPlot/HoloViews/Datashader for
+  notebook-first HoloViz dashboards, Dash/Plotly only for standalone Dash apps,
+  Streamlit only for Streamlit apps, and Polars GPU Engine only when the user
+  already has or requests a Polars path.
+- Always keep a pandas CPU fallback unless the user explicitly requires
+  GPU-only execution.
 
 ## Naming
 
